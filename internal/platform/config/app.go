@@ -1,7 +1,8 @@
 package config
 
 type AppConfig struct {
-	HOST    string
-	PORT    string
-	GinMode string
+	HOST      string
+	PORT      string
+	GinMode   string
+	JwtSecret string
 }

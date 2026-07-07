@@ -7,9 +7,10 @@ import (
 
 func LoadApp() AppConfig {
 	return AppConfig{
-		HOST:    os.Getenv("HOST"),
-		PORT:    os.Getenv("PORT"),
-		GinMode: os.Getenv("GIN_MODE"),
+		HOST:      os.Getenv("HOST"),
+		PORT:      os.Getenv("PORT"),
+		GinMode:   os.Getenv("GIN_MODE"),
+		JwtSecret: os.Getenv("JWT_SECRET"),
 	}
 }
 

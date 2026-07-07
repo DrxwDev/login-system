@@ -1,6 +1,5 @@
 include .env
 
-
 migrations:
 	@goose -dir=database/migrations/schema create ${name} sql
 
