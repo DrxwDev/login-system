@@ -9,6 +9,7 @@ import (
 	"github.com/DrxwDev/login-system/internal/adapters/http"
 	"github.com/DrxwDev/login-system/internal/platform/config"
 	"github.com/DrxwDev/login-system/internal/platform/logger"
+	"github.com/DrxwDev/login-system/internal/platform/validation"
 )
 
 var Module = fx.Options(
@@ -17,4 +18,5 @@ var Module = fx.Options(
 	http.Module,
 	argon.Module,
 	token.Module,
+	validation.Module,
 )
