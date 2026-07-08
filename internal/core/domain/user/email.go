@@ -20,3 +20,7 @@ func NewEmail(value string) (Email, error) {
 
 	return Email(value), nil
 }
+
+func (e Email) String() string {
+	return string(e)
+}

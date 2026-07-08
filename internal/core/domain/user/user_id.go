@@ -1,6 +1,8 @@
 package user
 
-import "strings"
+import (
+	"strings"
+)
 
 type UserID string
 
@@ -12,4 +14,8 @@ func NewUserID(value string) (UserID, error) {
 	}
 
 	return UserID(value), nil
+}
+
+func (id UserID) String() string {
+	return string(id)
 }
