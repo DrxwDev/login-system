@@ -19,7 +19,7 @@ func NewTokenService(cfg config.AppConfig) *TokenService {
 	}
 }
 
-func (s TokenService) Generate(userID string, cfg config.AppConfig) (string, error) {
+func (s TokenService) Generate(userID string) (string, error) {
 	// validate user id
 	if userID == "" {
 		return "", ErrUserIDNotProvided
@@ -46,7 +46,7 @@ func (s TokenService) Generate(userID string, cfg config.AppConfig) (string, err
 	return tokenString, nil
 }
 
-func (s TokenService) Validate(token string, cfg config.AppConfig) (string, error) {
+func (s TokenService) Validate(token string) (string, error) {
 	claims := &jwt.RegisteredClaims{}
 
 	// parse token
