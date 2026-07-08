@@ -21,6 +21,14 @@ func NewUser(id UserID, name string, email Email, password Password) (User, erro
 		return User{}, ErrNameRequired
 	}
 
+	if len(name) < 5 {
+		return User{}, ErrNameTooShort
+	}
+
+	if len(name) > 100 {
+		return User{}, ErrNameTooLong
+	}
+
 	return User{
 		ID:       id,
 		Name:     name,

@@ -21,3 +21,7 @@ func NewPassword(value string) (Password, error) {
 
 	return Password(value), nil
 }
+
+func (p Password) String() string {
+	return string(p)
+}
