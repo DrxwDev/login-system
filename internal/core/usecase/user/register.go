@@ -14,8 +14,6 @@ type RegisterUseCase struct {
 	hasher ports.PasswordHasher
 }
 
-// var _ ports.PasswordHasher = (*RegisterUseCase)(nil)
-
 func NewRegisterUseCase(repo ports.UserRepository, hasher ports.PasswordHasher) *RegisterUseCase {
 	return &RegisterUseCase{
 		repo:   repo,

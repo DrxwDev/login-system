@@ -19,4 +19,5 @@ func RegisterRoutes(router *gin.Engine, userH *handlers.UserHandler) {
 	apiV1 := router.Group("/api/v1")
 
 	apiV1.POST("/register", userH.Register)
+	apiV1.POST("/login", userH.Login)
 }

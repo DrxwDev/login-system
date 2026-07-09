@@ -18,3 +18,8 @@ type UserDTO struct {
 	Email     string `json:"email"`
 	CreatedAt string `json:"created_at"`
 }
+
+type LoginResponse struct {
+	User  UserDTO `json:"user"`
+	Token string  `json:"token"`
+}
