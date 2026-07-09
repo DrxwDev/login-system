@@ -7,14 +7,35 @@ import (
 	"github.com/DrxwDev/login-system/internal/core/domain/user"
 )
 
-func userFromDBToDomain(params sqlc.User) user.User {
-	return user.User{
-		ID:        user.UserID(params.ID.String()),
-		Name:      params.Name,
-		Email:     user.Email(params.Email),
-		Password:  user.Password(params.Password),
-		CreatedAt: params.CreatedAt,
+func userFromDBToDomain(row sqlc.User) (user.User, error) {
+	id, err := user.NewUserID(row.ID.String())
+	if err != nil {
+		return user.User{}, err
 	}
+
+	email, err := user.NewEmail(row.Email)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	password, err := user.NewHashedPassword(row.Password)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	u, err := user.NewUser(
+		id,
+		row.Name,
+		email,
+		password,
+	)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	u.CreatedAt = row.CreatedAt
+
+	return u, nil
 }
 
 func userDomainToSaveParams(u user.User) (sqlc.SaveParams, error) {

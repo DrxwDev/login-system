@@ -1,5 +1,4 @@
-// Package argon
-package argon
+package postgres
 
 import (
 	"go.uber.org/fx"
@@ -8,11 +7,11 @@ import (
 )
 
 var Module = fx.Module(
-	"argon",
+	"postgres",
 	fx.Provide(
 		fx.Annotate(
-			NewHasher,
-			fx.As(new(ports.PasswordHasher)),
+			NewUserRepository,
+			fx.As(new(ports.UserRepository)),
 		),
 	),
 )

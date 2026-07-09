@@ -25,3 +25,11 @@ func NewPassword(value string) (Password, error) {
 func (p Password) String() string {
 	return string(p)
 }
+
+func NewHashedPassword(hash string) (Password, error) {
+	if hash == "" {
+		return "", ErrPasswordRequired
+	}
+
+	return Password(hash), nil
+}
