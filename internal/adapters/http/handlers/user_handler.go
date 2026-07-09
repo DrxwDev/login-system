@@ -10,6 +10,7 @@ import (
 
 	"github.com/DrxwDev/login-system/internal/adapters/http/dto"
 	"github.com/DrxwDev/login-system/internal/adapters/http/mapper"
+	"github.com/DrxwDev/login-system/internal/adapters/http/middlewares"
 	usecase "github.com/DrxwDev/login-system/internal/core/usecase/user"
 )
 
@@ -17,13 +18,15 @@ type UserHandler struct {
 	register *usecase.RegisterUseCase
 	validate *validator.Validate
 	login    *usecase.LoginUseCase
+	find     *usecase.GetUserByIDUseCase
 }
 
-func NewUserHandler(register *usecase.RegisterUseCase, validate *validator.Validate, login *usecase.LoginUseCase) *UserHandler {
+func NewUserHandler(register *usecase.RegisterUseCase, validate *validator.Validate, login *usecase.LoginUseCase, find *usecase.GetUserByIDUseCase) *UserHandler {
 	return &UserHandler{
 		register: register,
 		validate: validate,
 		login:    login,
+		find:     find,
 	}
 }
 
@@ -102,6 +105,43 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"user":   mapper.UserDomainToDTO(user),
+	})
+}
+
+func (h *UserHandler) Logout(ctx *gin.Context) {
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "access_token",
+		Path:     "/",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		Secure:   true,
+		HttpOnly: true,
+		MaxAge:   -1,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *UserHandler) User(ctx *gin.Context) {
+	claims, ok := middlewares.GetClaims(ctx)
+	if !ok {
+		ctx.Status(http.StatusUnauthorized)
+		return
+	}
+
+	user, err := h.find.GetUser(ctx.Request.Context(), claims.Subject)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"status": "failed",
+			"error":  err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": "success",

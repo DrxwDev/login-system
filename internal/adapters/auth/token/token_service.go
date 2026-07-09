@@ -2,12 +2,16 @@
 package token
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 
+	"github.com/DrxwDev/login-system/internal/core/ports"
 	"github.com/DrxwDev/login-system/internal/platform/config"
 )
+
+const issuer = "access_token"
 
 type TokenService struct {
 	cfg config.AppConfig
@@ -19,7 +23,7 @@ func NewTokenService(cfg config.AppConfig) *TokenService {
 	}
 }
 
-func (s TokenService) Generate(userID string) (string, error) {
+func (s *TokenService) Generate(userID string) (string, error) {
 	// validate user id
 	if userID == "" {
 		return "", ErrUserIDNotProvided
@@ -27,7 +31,7 @@ func (s TokenService) Generate(userID string) (string, error) {
 
 	// register token claims
 	claims := jwt.RegisteredClaims{
-		Issuer:    "access-token",
+		Issuer:    issuer,
 		Subject:   userID,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add((24 * time.Hour) * 30)),
 		NotBefore: jwt.NewNumericDate(time.Now()),
@@ -46,25 +50,45 @@ func (s TokenService) Generate(userID string) (string, error) {
 	return tokenString, nil
 }
 
-func (s TokenService) Validate(token string) (string, error) {
+func (s *TokenService) Validate(token string) (*ports.TokenClaims, error) {
 	claims := &jwt.RegisteredClaims{}
 
 	// parse token
 	t, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
-		if t.Method != jwt.SigningMethodHS256 {
+		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, ErrInvalidTokenMethod
 		}
 		return []byte(s.cfg.JwtSecret), nil
 	})
 	if err != nil {
-		return "", ErrUnableToParseToken
+		return nil, fmt.Errorf("%w: %v", ErrUnableToParseToken, err)
 	}
 
 	// validate token
 	if !t.Valid {
-		return "", ErrInvalidAccessToken
+		return nil, ErrInvalidAccessToken
+	}
+
+	if claims.ExpiresAt == nil ||
+		claims.IssuedAt == nil ||
+		claims.NotBefore == nil {
+		return nil, ErrInvalidAccessToken
+	}
+
+	if claims.Subject == "" {
+		return nil, ErrInvalidAccessToken
+	}
+
+	if claims.Issuer != issuer {
+		return nil, ErrInvalidAccessToken
 	}
 
 	// return user id as Subject
-	return claims.Subject, nil
+	return &ports.TokenClaims{
+		Subject:   claims.Subject,
+		Issuer:    claims.Issuer,
+		ExpiresAt: claims.ExpiresAt.Time,
+		IssuedAt:  claims.IssuedAt.Time,
+		NotBefore: claims.NotBefore.Time,
+	}, nil
 }
