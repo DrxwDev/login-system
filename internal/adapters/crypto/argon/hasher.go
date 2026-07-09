@@ -4,6 +4,8 @@ import (
 	"runtime"
 
 	"github.com/alexedwards/argon2id"
+
+	"github.com/DrxwDev/login-system/internal/core/ports"
 )
 
 type Hasher struct {
@@ -21,6 +23,8 @@ func NewHasher() *Hasher {
 		},
 	}
 }
+
+var _ ports.PasswordHasher = (*Hasher)(nil)
 
 func (h Hasher) Hash(password string) (string, error) {
 	if password == "" {

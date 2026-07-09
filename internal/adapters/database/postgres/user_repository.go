@@ -22,7 +22,17 @@ func NewUserRepository(q *sqlc.Queries) *UserRepository {
 }
 
 func (r UserRepository) Create(ctx context.Context, u user.User) error {
-	panic("not implemented") // TODO: Implement
+	params, err := userDomainToSaveParams(u)
+	if err != nil {
+		return err
+	}
+
+	err = r.queries.Save(ctx, params)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r UserRepository) FindByEmail(ctx context.Context, email user.Email) (user.User, error) {

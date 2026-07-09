@@ -1,4 +1,5 @@
-package http
+// Package mapper
+package mapper
 
 import (
 	"github.com/DrxwDev/login-system/internal/adapters/http/dto"
@@ -6,7 +7,7 @@ import (
 	usecase "github.com/DrxwDev/login-system/internal/core/usecase/user"
 )
 
-func userDomainToDTO(user user.User) dto.UserDTO {
+func UserDomainToDTO(user user.User) dto.UserDTO {
 	return dto.UserDTO{
 		ID:        string(user.ID),
 		Name:      user.Name,
@@ -15,7 +16,7 @@ func userDomainToDTO(user user.User) dto.UserDTO {
 	}
 }
 
-func userRegisterParams(payload dto.RegisterRequest) usecase.RegisterParams {
+func UserRegisterParams(payload dto.RegisterRequest) usecase.RegisterParams {
 	return usecase.RegisterParams{
 		Name:     payload.Name,
 		Email:    payload.Email,
@@ -23,7 +24,7 @@ func userRegisterParams(payload dto.RegisterRequest) usecase.RegisterParams {
 	}
 }
 
-func userLoginParams(payload dto.LoginRequest) usecase.LoginParams {
+func UserLoginParams(payload dto.LoginRequest) usecase.LoginParams {
 	return usecase.LoginParams{
 		Email:    payload.Email,
 		Password: payload.Password,

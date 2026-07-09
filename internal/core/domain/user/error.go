@@ -13,4 +13,5 @@ var (
 	ErrNameTooShort        = errors.New("name must be at least 5 characters")
 	ErrNameTooLong         = errors.New("name is too long")
 	ErrUnableToParseUserID = errors.New("unable to parse user_id")
+	ErrInvalidUserID       = errors.New("invalid user id")
 )
