@@ -29,14 +29,19 @@ func (r UserRepository) Create(ctx context.Context, u user.User) error {
 
 	err = r.queries.Save(ctx, params)
 	if err != nil {
-		return err
+		return ErrUnableToCreateUser
 	}
 
 	return nil
 }
 
 func (r UserRepository) FindByEmail(ctx context.Context, email user.Email) (user.User, error) {
-	panic("not implemented") // TODO: Implement
+	row, err := r.queries.GetUserByEmail(ctx, email.String())
+	if err != nil {
+		return user.User{}, ErrUserNotFound
+	}
+
+	return userFromDBToDomain(row)
 }
 
 func (r UserRepository) FindByID(ctx context.Context, id user.UserID) (user.User, error) {
