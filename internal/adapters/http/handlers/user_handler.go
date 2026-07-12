@@ -44,22 +44,33 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 	if err := h.validate.Struct(payload); err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
 			"status":  "failed",
-			"message": "unable to register",
+			"message": "invalid forms fields",
 			"error":   err.Error(),
 		})
 		return
 	}
 
 	params := mapper.UserRegisterParams(payload)
-	newUser, err := h.register.Register(ctx.Request.Context(), params)
+	newUser, token, err := h.register.Register(ctx.Request.Context(), params)
 	if err != nil {
 		ctx.JSON(http.StatusConflict, gin.H{
 			"status":  "failed",
-			"message": "unable to create user",
+			"message": "user already exists",
 			"error":   err.Error(),
 		})
 		return
 	}
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:     "access_token",
+		Path:     "/",
+		Value:    token,
+		MaxAge:   3600,
+		Expires:  time.Now().Add(time.Hour),
+		Secure:   false,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 
 	ctx.JSON(http.StatusCreated, mapper.UserDomainToDTO(newUser))
 }
@@ -101,7 +112,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 		Value:    token,
 		MaxAge:   3600,
 		Expires:  time.Now().Add(time.Hour),
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
@@ -118,7 +129,7 @@ func (h *UserHandler) Logout(ctx *gin.Context) {
 		Path:     "/",
 		Value:    "",
 		Expires:  time.Unix(0, 0),
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 		MaxAge:   -1,
 		SameSite: http.SameSiteLaxMode,
